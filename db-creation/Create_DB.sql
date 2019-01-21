@@ -1,120 +1,128 @@
 CREATE TYPE user_type AS ENUM (
-    'Seeker',
-    'Recruiter'
+    'SEEKER',
+    'RECRUITER'
 );
 
 CREATE TYPE visibility_status AS ENUM (
-    'Видно всему интернету',
-    'Не видно никому',
-    'Видно зарегистрированным',
-    'Видно только по ссылке'
+    'ALL INTERNET',
+    'NOBODY',
+    'REGISTERED',
+    'BY REFERENCE'
 );
 
 CREATE TYPE busyness_type AS ENUM (
-    'Full_time',
-    'Part_time',
-    'Flexible',
-    'Remote'
+    'FULL_TIME',
+    'PART_TIME',
+    'FLEXIBLE',
+    'REMOTE'
 );
 
 CREATE TYPE interaction_status AS ENUM (
-    'Whatched',
-    'NotWhatched',
-    'Invited',
-    'Rejected'
+    'WHATCHED',
+    'NOTWHATCHED',
+    'INVITED',
+    'REJECTED'
 );
 
 CREATE TYPE interaction_type AS ENUM (
-    'Reply',
-    'Invite'
+    'REPLY',
+    'INVITE'
 );
 
-CREATE TABLE Account (
+CREATE TABLE account (
     account_id SERIAL PRIMARY KEY,
     login varchar(30) UNIQUE NOT NULL,
-    password varchar(30) NOT NULL,
+    password text NOT NULL,
     registration_time timestamptz NOT NULL,
     last_login_time timestamptz,
     account_type user_type NOT NULL
 );
 
-CREATE TABLE Resume (
+CREATE TABLE resume (
     resume_id SERIAL PRIMARY KEY,
-    account_id int REFERENCES Account NOT NULL,
-    position varchar(256) NOT NULL,
+    account_id int REFERENCES account NOT NULL,
     full_name varchar(256) NOT NULL,
-    age int,
+    position varchar(256) NOT NULL,
+    date_of_birth date,
     city varchar(60) NOT NULL,
     salary int4range,                -- Вилка ЗП
-    experience real,                 -- Опыт работы в годах
     busyness busyness_type,
     publication_begin_time timestamptz NOT NULL, -- Время размещения
     publication_end_time timestamptz,     -- Время окончания публикации
     status visibility_status NOT NULL,
-    valid bool NOT NULL
+    active bool NOT NULL
 );
 
-CREATE TABLE Company (
+CREATE TABLE experience (
+    experience_id SERIAL PRIMARY KEY,
+    resume_id int REFERENCES resume NOT NULL,
+    position varchar(256) NOT NULL,
+    company_name varchar(256) NOT NULL,
+    begin_time date NOT NULL,
+    end_time date
+);
+
+CREATE TABLE company (
     company_id SERIAL PRIMARY KEY,
     company_name varchar(256) NOT NULL,
     description text,
-    registration_time timestamptz,
-    sphere varchar(128)[]
+    registration_time timestamptz NOT NULL
 );
 
-CREATE TABLE Recruiter (
+CREATE TABLE recruiter (
     recruiter_id SERIAL PRIMARY KEY,
-    account_id int REFERENCES Account NOT NULL,
-    company_id int REFERENCES Company NOT NULL,
+    account_id int REFERENCES account NOT NULL,
+    company_id int REFERENCES company NOT NULL,
     begin_time timestamptz NOT NULL,
     end_time timestamptz 
 );
 
-CREATE TABLE Vacancy (
+CREATE TABLE vacancy (
     vacancy_id SERIAL PRIMARY KEY,
-    recruiter_id int REFERENCES Recruiter NOT NULL,
-    company_id int REFERENCES Company NOT NULL,        --?
-    position varchar(30) NOT NULL,
+    recruiter_id int REFERENCES recruiter NOT NULL,
+    company_id int REFERENCES company NOT NULL,        --?
+    position varchar(256) NOT NULL,
     description text,
     salary int4range,                -- Вилка ЗП
+    busyness busyness_type,             -- Требуемая занятость
     required_experience real,         -- Требуемый опыт работы в годах
     publication_begin_time timestamptz NOT NULL,     -- Время размещения
     publication_end_time timestamptz,                 -- Время окончания публикации
     status visibility_status NOT NULL,
-    valid bool NOT NULL
+    active bool NOT NULL
 );
 
-CREATE TABLE Interaction (
+CREATE TABLE interaction (
     interaction_id SERIAL PRIMARY KEY,
-    resume_id int REFERENCES Resume NOT NULL,
-    vacancy_id int REFERENCES Vacancy NOT NULL,
+    resume_id int REFERENCES resume NOT NULL,
+    vacancy_id int REFERENCES vacancy NOT NULL,
     publication_time timestamptz NOT NULL,
     interaction_type interaction_type NOT NULL,
     status interaction_status NOT NULL
 );
 
-CREATE TABLE Message (
+CREATE TABLE message (
     message_id SERIAL PRIMARY KEY,
-    interaction_id int REFERENCES Interaction NOT NULL,
+    interaction_id int REFERENCES interaction NOT NULL,
     message_text text NOT NULL,
     sender user_type NOT NULL,
     sending_time timestamptz NOT NULL
 );
 
-CREATE TABLE Skill (
+CREATE TABLE skill (
     skill_id SERIAL PRIMARY KEY,
     skill_name varchar(128) NOT NULL,
-    valid bool NOT NULL
+    confirmed bool NOT NULL
 );
 
-CREATE TABLE Skills_to_Resume (
-    skills_to_resume_id SERIAL PRIMARY KEY,
-    skill_id int REFERENCES Skill NOT NULL,
-    resume_id int REFERENCES Resume NOT NULL
+CREATE TABLE skill_to_resume (
+    skill_to_resume_id SERIAL PRIMARY KEY,
+    skill_id int REFERENCES skill NOT NULL,
+    resume_id int REFERENCES resume NOT NULL
 );
 
-CREATE TABLE Skills_to_Vacancy (
-    skills_to_vacancy_id SERIAL PRIMARY KEY,
-    skill_id int REFERENCES Skill NOT NULL,
-    vacancy_id int REFERENCES Vacancy NOT NULL
+CREATE TABLE skill_to_vacancy (
+    skill_to_vacancy_id SERIAL PRIMARY KEY,
+    skill_id int REFERENCES skill NOT NULL,
+    vacancy_id int REFERENCES vacancy NOT NULL
 );
