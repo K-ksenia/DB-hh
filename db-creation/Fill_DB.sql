@@ -1,5 +1,3 @@
-CREATE EXTENSION pgcrypto;
-
 INSERT INTO account (
     login,
     password,
@@ -23,7 +21,7 @@ INSERT INTO resume (
     position,
     date_of_birth,
     city,
-    salary,                -- Вилка ЗП
+    salary,                 -- Вилка ЗП
     busyness,
     publication_begin_time, -- Время размещения
     status,
@@ -133,7 +131,9 @@ INSERT INTO vacancy (
     company_id,
     position,
     description,
+    city,
     salary,                 -- Вилка ЗП
+    busyness,
     required_experience,    -- Требуемый опыт работы в годах
     publication_begin_time, -- Время размещения
     status,
@@ -144,7 +144,9 @@ INSERT INTO vacancy (
     знание C# и .Net Framework;
     знание алгоритмов и структур данных;
     опыт UWP/Windows Phone или WPF;',
+    'Москва',
     NULL,
+    'FULL_TIME',
     4,
     '2018-05-10',
     'REGISTERED',
@@ -155,7 +157,9 @@ INSERT INTO vacancy (
     формулировать вопросы, относящиеся к нашему бизнесу, и отвечать на них, пользуясь фактами и цифрами;
     готовить аналитические отчеты об операционной деятельности компании;
     разрабатывать алгоритмы и модели для развития нашего сервиса.',
+    'Москва',
     NULL,
+    'FULL_TIME',
     2,
     '2018-08-10',
     'REGISTERED',
@@ -168,7 +172,9 @@ INSERT INTO vacancy (
     знание Java и/или C++;
     базовые знания SQL;
     базовые знания Python (будут плюсом).',
+    'Москва',
     INT4RANGE(90000,120000),
+    'FULL_TIME',
     4,
     '2018-12-10',
     'ALL INTERNET',
@@ -179,7 +185,9 @@ INSERT INTO vacancy (
     высшее профессиональное образование в сфере музыки;
     опыт работы с детьми;
     навык общения с родителями;',
+    'Москва',
     INT4RANGE(20000,50000),
+    'PART_TIME',
     1,
     '2018-05-29',
     'ALL INTERNET',
@@ -193,7 +201,9 @@ INSERT INTO vacancy (
     Английский язык на разговорном уровне.
     Отличное знание бизнес-процессов склада
     Успешный опыт выполнения KPI складского комплекса',
+    'Москва',
     NULL,
+    'FULL_TIME',
     3,
     '2018-11-23',
     'REGISTERED',
@@ -206,7 +216,9 @@ INSERT INTO vacancy (
     опыт работы с системами сборки и управления пакетами;
     знание HTML/CSS;
     опыт работы с базами данных MySQL и MongoDB;',
+    'Москва',
     NULL,
+    'FULL_TIME',
     2,
     '2018-11-15',
     'ALL INTERNET',
@@ -221,7 +233,9 @@ INSERT INTO vacancy (
     Опыт работы с git, linux
     Умение быстро разбираться в сложных технических вопросах
     Умение работать по формальной методологии разработки (Agile)',
+    'Москва',
     NULL,
+    'FULL_TIME',
     1.5,
     '2018-11-29',
     'ALL INTERNET',

@@ -83,6 +83,7 @@ CREATE TABLE vacancy (
     company_id int REFERENCES company NOT NULL,        --?
     position varchar(256) NOT NULL,
     description text,
+    city varchar(60) NOT NULL,
     salary int4range,                -- Вилка ЗП
     busyness busyness_type,             -- Требуемая занятость
     required_experience real,         -- Требуемый опыт работы в годах
@@ -126,3 +127,5 @@ CREATE TABLE skill_to_vacancy (
     skill_id int REFERENCES skill NOT NULL,
     vacancy_id int REFERENCES vacancy NOT NULL
 );
+
+CREATE EXTENSION pgcrypto;
