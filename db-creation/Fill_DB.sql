@@ -3,11 +3,11 @@ INSERT INTO account (
     password,
     registration_time,
     account_type
-) VALUES ('petrovpetya@gmail.com', crypt('123451988', gen_salt('bf')), '2018-11-01 12:00:00', 'SEEKER'),
-('sirsidr@yandex.ru', crypt('qwert12345', gen_salt('bf')), '2018-11-02 12:00:00', 'SEEKER'),
-('subaru15@gmail.com', crypt('2ue23oi', gen_salt('bf')), '2018-11-03 12:00:00', 'SEEKER'),
-('lolik@gmail.com', crypt('nfjs111', gen_salt('bf')), '2018-11-04 12:00:00', 'SEEKER'),
-('bolek@gmail.com', crypt('qwerty', gen_salt('bf')), '2018-11-04 13:00:00', 'SEEKER'),
+) VALUES ('petrovpetya@gmail.com', crypt('123451988', gen_salt('bf')), '2018-11-01 12:00:00', 'APPLICANT'),
+('sirsidr@yandex.ru', crypt('qwert12345', gen_salt('bf')), '2018-11-02 12:00:00', 'APPLICANT'),
+('subaru15@gmail.com', crypt('2ue23oi', gen_salt('bf')), '2018-11-03 12:00:00', 'APPLICANT'),
+('lolik@gmail.com', crypt('nfjs111', gen_salt('bf')), '2018-11-04 12:00:00', 'APPLICANT'),
+('bolek@gmail.com', crypt('qwerty', gen_salt('bf')), '2018-11-04 13:00:00', 'APPLICANT'),
 ('lampard@gmail.com', crypt('22041985', gen_salt('bf')), '2018-11-05 12:00:00', 'RECRUITER'),
 ('nitochka@gmail.com', crypt('alskjd', gen_salt('bf')), '2018-11-06 12:00:00', 'RECRUITER'),
 ('fernando@gmail.com', crypt('zxcvb', gen_salt('bf')), '2018-11-07 12:00:00', 'RECRUITER'),
@@ -24,7 +24,7 @@ INSERT INTO resume (
     salary,                 -- Вилка ЗП
     busyness,
     publication_begin_time, -- Время размещения
-    status,
+    visibility_status,
     active
 ) VALUES (1, 
     'Петров Петр Петрович',
@@ -118,12 +118,12 @@ INSERT INTO company (
 INSERT INTO recruiter (
     account_id,
     company_id,
-    begin_time
-) VALUES (6, 1, '2017-05-04'),
-(7, 2, '2017-05-04'),
-(8, 3, '2018-05-04'),
-(9, 2, '2018-05-04'),
-(10, 1, '2018-05-04')
+    active
+) VALUES (6, 1, TRUE),
+(7, 2, TRUE),
+(8, 3, TRUE),
+(9, 2, TRUE),
+(10, 1, TRUE)
 ;
 
 INSERT INTO vacancy (
@@ -136,7 +136,7 @@ INSERT INTO vacancy (
     busyness,
     required_experience,    -- Требуемый опыт работы в годах
     publication_begin_time, -- Время размещения
-    status,
+    visibility_status,
     active
 ) VALUES (1, 1, 
     'Разработчик Яндекс.Музыки', 
@@ -147,7 +147,7 @@ INSERT INTO vacancy (
     'Москва',
     NULL,
     'FULL_TIME',
-    4,
+    '3-6',
     '2018-05-10',
     'REGISTERED',
     TRUE),
@@ -160,7 +160,7 @@ INSERT INTO vacancy (
     'Москва',
     NULL,
     'FULL_TIME',
-    2,
+    '1-3',
     '2018-08-10',
     'REGISTERED',
     TRUE),
@@ -175,7 +175,7 @@ INSERT INTO vacancy (
     'Москва',
     INT4RANGE(90000,120000),
     'FULL_TIME',
-    4,
+    '3-6',
     '2018-12-10',
     'ALL INTERNET',
     TRUE),
@@ -188,7 +188,7 @@ INSERT INTO vacancy (
     'Москва',
     INT4RANGE(20000,50000),
     'PART_TIME',
-    1,
+    '1-3',
     '2018-05-29',
     'ALL INTERNET',
     TRUE),
@@ -204,7 +204,7 @@ INSERT INTO vacancy (
     'Москва',
     NULL,
     'FULL_TIME',
-    3,
+    '3-6',
     '2018-11-23',
     'REGISTERED',
     TRUE),
@@ -219,7 +219,7 @@ INSERT INTO vacancy (
     'Москва',
     NULL,
     'FULL_TIME',
-    2,
+    '1-3',
     '2018-11-15',
     'ALL INTERNET',
     TRUE),
@@ -236,7 +236,7 @@ INSERT INTO vacancy (
     'Москва',
     NULL,
     'FULL_TIME',
-    1.5,
+    '0-1',
     '2018-11-29',
     'ALL INTERNET',
     TRUE)
@@ -258,14 +258,15 @@ INSERT INTO interaction (
 INSERT INTO message (
     interaction_id,
     message_text,
-    sender,
-    sending_time
-) VALUES (1, 'Добрый день! Меня заинтересовала представленная Вами вакансия. С уважением, Петр', 'SEEKER', '2018-12-11 12:21:46+03'),
-(2, 'Здравствуйте, Петр! Ваше резюме показалось нам очень интересным. Если наше предложение Вам интересно, свяжитесь со мной, пожалуйста. С уважением, Анна', 'RECRUITER', '2018-12-02 12:21:46+03'),
-(3, 'Здравствуйте! Меня заинтересовала представленная Вами вакансия. С уважением, Сидр', 'SEEKER', '2018-12-25 12:21:46+03'),
-(4, 'Добрый день, Азамат! Ваше резюме показалось нам очень интересным. Если наше предложение Вам интересно, свяжитесь со мной, пожалуйста. С уважением, Виктория', 'RECRUITER', '2018-12-11 12:21:46+03'),
-(5, 'Добрый день! Ваше резюме показалось нам очень интересным. С уважением, Яндекс', 'SEEKER', '2018-12-01 12:21:46+03'),
-(1, 'Добрый день! Ваша кандидатура нам оч интересна! Вам удобно будет придти на собеседование завтра в 15:00? С уважением, Софья', 'SEEKER', '2018-12-11 15:21:46+03')
+    account_id,
+    sending_time,
+    status
+) VALUES (1, 'Добрый день! Меня заинтересовала представленная Вами вакансия. С уважением, Петр', 1, '2018-12-11 12:21:46+03', 'NOTWHATCHED'),
+(2, 'Здравствуйте, Петр! Ваше резюме показалось нам очень интересным. Если наше предложение Вам интересно, свяжитесь со мной, пожалуйста. С уважением, Анна', 6, '2018-12-02 12:21:46+03', 'WHATCHED'),
+(3, 'Здравствуйте! Меня заинтересовала представленная Вами вакансия. С уважением, Сидр', 2, '2018-12-25 12:21:46+03', 'NOTWHATCHED'),
+(4, 'Добрый день, Азамат! Ваше резюме показалось нам очень интересным. Если наше предложение Вам интересно, свяжитесь со мной, пожалуйста. С уважением, Виктория', 8, '2018-12-11 12:21:46+03', 'NOTWHATCHED'),
+(5, 'Добрый день! Ваше резюме показалось нам очень интересным. С уважением, Яндекс', 10, '2018-12-01 12:21:46+03', 'NOTWHATCHED'),
+(1, 'Добрый день! Ваша кандидатура нам оч интересна! Вам удобно будет придти на собеседование завтра в 15:00? С уважением, Софья', 7, '2018-12-11 15:21:46+03', 'NOTWHATCHED')
 ;
 
 INSERT INTO skill (

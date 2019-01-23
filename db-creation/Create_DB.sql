@@ -1,5 +1,5 @@
-CREATE TYPE user_type AS ENUM (
-    'SEEKER',
+CREATE TYPE account_type AS ENUM (
+    'APPLICANT',
     'RECRUITER'
 );
 
@@ -17,11 +17,24 @@ CREATE TYPE busyness_type AS ENUM (
     'REMOTE'
 );
 
+CREATE TYPE experience_years AS ENUM (
+    '0-1',
+    '1-3',
+    '3-6',
+    '6+',
+    'ANY'
+);
+
 CREATE TYPE interaction_status AS ENUM (
     'WHATCHED',
     'NOTWHATCHED',
     'INVITED',
     'REJECTED'
+);
+
+CREATE TYPE message_status AS ENUM (
+    'WHATCHED',
+    'NOTWHATCHED'
 );
 
 CREATE TYPE interaction_type AS ENUM (
@@ -35,7 +48,7 @@ CREATE TABLE account (
     password text NOT NULL,
     registration_time timestamptz NOT NULL,
     last_login_time timestamptz,
-    account_type user_type NOT NULL
+    account_type account_type NOT NULL
 );
 
 CREATE TABLE resume (
@@ -49,7 +62,7 @@ CREATE TABLE resume (
     busyness busyness_type,
     publication_begin_time timestamptz NOT NULL, -- Время размещения
     publication_end_time timestamptz,     -- Время окончания публикации
-    status visibility_status NOT NULL,
+    visibility_status visibility_status NOT NULL,
     active bool NOT NULL
 );
 
@@ -73,8 +86,7 @@ CREATE TABLE recruiter (
     recruiter_id SERIAL PRIMARY KEY,
     account_id int REFERENCES account NOT NULL,
     company_id int REFERENCES company NOT NULL,
-    begin_time timestamptz NOT NULL,
-    end_time timestamptz 
+    active bool NOT NULL
 );
 
 CREATE TABLE vacancy (
@@ -86,10 +98,10 @@ CREATE TABLE vacancy (
     city varchar(60) NOT NULL,
     salary int4range,                -- Вилка ЗП
     busyness busyness_type,             -- Требуемая занятость
-    required_experience real,         -- Требуемый опыт работы в годах
+    required_experience experience_years,            -- Требуемый опыт работы
     publication_begin_time timestamptz NOT NULL,     -- Время размещения
-    publication_end_time timestamptz,                 -- Время окончания публикации
-    status visibility_status NOT NULL,
+    publication_end_time timestamptz,                -- Время окончания публикации
+    visibility_status visibility_status NOT NULL,
     active bool NOT NULL
 );
 
@@ -106,8 +118,9 @@ CREATE TABLE message (
     message_id SERIAL PRIMARY KEY,
     interaction_id int REFERENCES interaction NOT NULL,
     message_text text NOT NULL,
-    sender user_type NOT NULL,
-    sending_time timestamptz NOT NULL
+    account_id int REFERENCES account NOT NULL,
+    sending_time timestamptz NOT NULL,
+    status message_status NOT NULL
 );
 
 CREATE TABLE skill (
