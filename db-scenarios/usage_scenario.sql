@@ -2,11 +2,11 @@
 
 -- Регистрация соискателя на сайте
 INSERT INTO account (login, password, registration_time, account_type
-) VALUES ('usermail@gmail.com', crypt('userpassword', gen_salt('bf')), CURRENT_TIMESTAMP, 'APPLICANT');
+) VALUES ('usermail@gmail.com', crypt('userpassword', gen_salt('bf')), now(), 'APPLICANT');
 
 
 -- Авторизация соискателя
-UPDATE account SET last_login_time=CURRENT_TIMESTAMP WHERE login='usermail@gmail.com' AND password = crypt('userpassword', password);
+UPDATE account SET last_login_time=now() WHERE login='usermail@gmail.com' AND password = crypt('userpassword', password);
 
 -- Этим запросом можем проверять совпадение пароля (Авторизация проходит, если запрос возвращает TRUE)
 SELECT (password = crypt('userpassword', password)) AS auth_check FROM account WHERE login='usermail@gmail.com';
@@ -14,19 +14,19 @@ SELECT (password = crypt('userpassword', password)) AS auth_check FROM account W
 
 -- Создание резюме
 INSERT INTO resume (account_id, full_name, position, date_of_birth, city, salary, busyness, publication_begin_time, visibility_status, active) 
-	VALUES (1,  'Фамилия Имя Отчество', 'Название должности',  '1990-11-05',  'Город',  INT4RANGE(55000,80000),  'FULL_TIME',  CURRENT_TIMESTAMP,  'ALL INTERNET',  TRUE);
+	VALUES (1,  'Фамилия Имя Отчество', 'Название должности',  '1990-11-05',  'Город',  INT4RANGE(55000,80000),  'FULL_TIME',  now(),  'ALL INTERNET',  TRUE);
 -- Подлинковываем скиллы
 INSERT INTO skill_to_resume (skill_id,resume_id) VALUES (1,1), (2,1), (3,1), (5,1);
--- Создаем и подлинковываем дополнительный скилл, созданный соискателем
-WITH created_skill AS (INSERT INTO skill (skill_name, confirmed) VALUES ('Находчивость', FALSE) RETURNING skill_id)
-INSERT INTO skill_to_resume (skill_id,resume_id) VALUES ((SELECT skill_id FROM created_skill), 1);
+-- Создаем и подлинковываем дополнительные скиллы, созданные соискателем
+WITH created_skill AS (INSERT INTO skill (skill_name, confirmed) VALUES ('Находчивость', FALSE),('Сообразительность', FALSE),('Активность', FALSE) RETURNING skill_id)
+INSERT INTO skill_to_resume (skill_id,resume_id) SELECT skill_id, 1 FROM created_skill;
 -- Подлинковываем опыт работы
 INSERT INTO experience (resume_id, position, company_name, begin_time, end_time) 
 VALUES (1, 'Грибник', 'ООО Грибные поля', '2007-03-01', '2013-04-15'),
 (1, 'Переводчик китайского', 'ООО Чайна нечайна', '2013-05-01', NULL);
 
 -- Удаление резюме
-UPDATE resume SET publication_end_time = CURRENT_TIMESTAMP, active = FALSE WHERE resume_id=1; 
+UPDATE resume SET publication_end_time = now(), active = FALSE WHERE resume_id=1; 
 
 
 -- 5. Поиск вакансий соискателем
@@ -77,15 +77,15 @@ WHERE company_id=1 AND active = TRUE;
 
 -- Отправка соискателем отклика на вакансию
 INSERT INTO interaction (resume_id, vacancy_id, publication_time, interaction_type, status) 
-VALUES (1, 1, CURRENT_TIMESTAMP, 'REPLY', 'NOTWHATCHED');
+VALUES (1, 1, now(), 'REPLY', 'NOTWHATCHED');
 
 
 -- Просмотр всех резюме соискателя + количество непрочитанных приглашений
 WITH cnt AS (SELECT resume_id, COUNT(*) not_watched_count 
-	FROM interaction WHERE status='NOTWHATCHED'
-	GROUP BY interaction_id)
+	FROM interaction WHERE status='NOTWHATCHED' AND interaction_type='INVITE'
+	GROUP BY resume_id)
 SELECT full_name, position, city, salary, publication_begin_time, not_watched_count
-FROM resume LEFT OUTER JOIN cnt USING(resume_id)
+FROM resume LEFT JOIN cnt USING(resume_id)
 WHERE account_id=1 AND active = TRUE
 ORDER BY publication_begin_time DESC;
 
@@ -110,19 +110,19 @@ UPDATE interaction SET status='WHATCHED' WHERE interaction_id=1;
 
 -- Отправка соискателем сообщения компании
 INSERT INTO message (interaction_id, message_text, account_id, sending_time, status) 
-VALUES (1, 'Добрый день! Текст сообщения от соискателя...', 1, CURRENT_TIMESTAMP, 'NOTWHATCHED');
+VALUES (1, 'Добрый день! Текст сообщения от соискателя...', 1, now(), 'NOTWHATCHED');
 
 
 -- Просмотр соискателем всех диалогов 
 WITH cnt AS (SELECT interaction_id, COUNT(*) not_watched_count FROM message 
 	WHERE status='NOTWHATCHED'
 	GROUP BY interaction_id)
-SELECT MAX(sending_time) AS sending_time, position, company_name, not_watched_count
+SELECT MAX(sending_time), position, company_name, not_watched_count
 FROM message
 JOIN interaction USING (interaction_id) 
 JOIN vacancy USING (vacancy_id)
 JOIN company USING (company_id)
-LEFT OUTER JOIN cnt USING(interaction_id)
+LEFT JOIN cnt USING(interaction_id)
 WHERE resume_id=1
 GROUP BY interaction_id, position, company_name, not_watched_count
 ORDER BY sending_time;
@@ -133,11 +133,11 @@ ORDER BY sending_time;
 
 -- Регистрация рекрутера на сайте
 INSERT INTO account (login, password, registration_time, account_type
-) VALUES ('hrmail@gmail.com', crypt('hrpassword', gen_salt('bf')), CURRENT_TIMESTAMP, 'RECRUITER');
+) VALUES ('hrmail@gmail.com', crypt('hrpassword', gen_salt('bf')), now(), 'RECRUITER');
 
 
 -- Авторизация рекрутера
-UPDATE account SET last_login_time=CURRENT_TIMESTAMP WHERE login='hrmail@gmail.com' AND password = crypt('hrpassword', password);
+UPDATE account SET last_login_time=now() WHERE login='hrmail@gmail.com' AND password = crypt('hrpassword', password);
 
 -- Этим запросом можем проверять совпадение пароля (Авторизация проходит, если запрос возвращает TRUE)
 SELECT (password = crypt('hrpassword', password)) AS auth_check FROM account WHERE login='hrmail@gmail.com';
@@ -145,7 +145,7 @@ SELECT (password = crypt('hrpassword', password)) AS auth_check FROM account WHE
 
 -- Регистрация компании на сайте
 INSERT INTO company (company_name, description, registration_time) 
-VALUES ('Введенное имя компании', 'Введенное описание компании.', CURRENT_TIMESTAMP);
+VALUES ('Введенное имя компании', 'Введенное описание компании.', now());
 
 
 -- Прикрепление рекрутера к компании
@@ -171,7 +171,7 @@ WHERE company_id = 1 AND active = TRUE;
 
 -- Создание вакансии
 INSERT INTO vacancy (recruiter_id, company_id, position, description, city, salary, busyness, required_experience, publication_begin_time, visibility_status, active) 
-VALUES (1, 1, 'Название должности', 'Описание должности', 'Город', INT4RANGE(60000,80000), 'FULL_TIME', '0-1', CURRENT_TIMESTAMP, 'ALL INTERNET', TRUE);
+VALUES (1, 1, 'Название должности', 'Описание должности', 'Город', INT4RANGE(60000,80000), 'FULL_TIME', '0-1', now(), 'ALL INTERNET', TRUE);
 -- Подлинковываем скиллы
 INSERT INTO skill_to_vacancy (skill_id, vacancy_id) VALUES (1,1), (3,1), (5,1);
 -- Создаем и подлинковываем дополнительный скилл, созданный рекрутером
@@ -180,7 +180,7 @@ INSERT INTO skill_to_vacancy (skill_id, vacancy_id) VALUES ((SELECT skill_id FRO
 
 
 -- Удаление вакансии
-UPDATE vacancy SET publication_end_time = CURRENT_TIMESTAMP, active = FALSE WHERE vacancy_id = 1;
+UPDATE vacancy SET publication_end_time = now(), active = FALSE WHERE vacancy_id = 1;
 
 
 -- Поиск резюме рекрутером
@@ -220,15 +220,15 @@ WHERE resume_id = 1;
 
 -- Отправка рекрутером приглашения автору резюме
 INSERT INTO interaction (resume_id, vacancy_id, publication_time, interaction_type, status) 
-VALUES (1, 1, CURRENT_TIMESTAMP, 'INVITE', 'NOTWHATCHED');
+VALUES (1, 1, now(), 'INVITE', 'NOTWHATCHED');
 
 
 -- Просмотр всех вакансий рекрутера + количество непрочитанных откликов
 WITH cnt AS (SELECT vacancy_id, COUNT(*) not_watched_count 
-	FROM interaction WHERE status='NOTWHATCHED'
-	GROUP BY interaction_id)
+	FROM interaction WHERE status='NOTWHATCHED' AND interaction_type='REPLY'
+	GROUP BY vacancy_id)
 SELECT position, company_name, city, salary, required_experience, publication_begin_time, not_watched_count
-FROM vacancy JOIN company USING(company_id) LEFT OUTER JOIN cnt USING(vacancy_id)
+FROM vacancy JOIN company USING(company_id) LEFT JOIN cnt USING(vacancy_id)
 WHERE recruiter_id=1 AND active = TRUE
 ORDER BY publication_begin_time DESC;
 
@@ -259,18 +259,18 @@ UPDATE interaction SET status='REJECTED' WHERE interaction_id=2;
 
 -- Отправка рекрутером сообщения соискателю
 INSERT INTO message (interaction_id, message_text, account_id, sending_time, status) 
-VALUES (2, 'Добрый день! Текст сообщения от работадателя...', 2, CURRENT_TIMESTAMP, 'NOTWHATCHED');
+VALUES (2, 'Добрый день! Текст сообщения от работадателя...', 2, now(), 'NOTWHATCHED');
 
 
 -- Просмотр рекрутером всех диалогов по выбранной вакансии
 WITH cnt AS (SELECT interaction_id, COUNT(*) not_watched_count FROM message 
 	WHERE status='NOTWHATCHED'
 	GROUP BY interaction_id)
-SELECT MAX(sending_time) AS sending_time, position, full_name, not_watched_count
+SELECT MAX(sending_time), position, full_name, not_watched_count
 FROM message
 JOIN interaction USING (interaction_id) 
 JOIN resume USING (resume_id)
-LEFT OUTER JOIN cnt USING(interaction_id)
+LEFT JOIN cnt USING(interaction_id)
 WHERE vacancy_id=3
 GROUP BY interaction_id, position, full_name, not_watched_count
 ORDER BY sending_time;
