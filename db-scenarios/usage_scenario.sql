@@ -1,8 +1,8 @@
 -----СЦЕНАРИЙ СО СТОРОНЫ СОИСКАТЕЛЯ------
 
 -- Регистрация соискателя на сайте
-INSERT INTO account (login, password, registration_time, account_type
-) VALUES ('usermail@gmail.com', crypt('userpassword', gen_salt('bf')), now(), 'APPLICANT');
+INSERT INTO account (login, password, full_name, registration_time, account_type
+) VALUES ('usermail@gmail.com', crypt('userpassword', gen_salt('bf')), 'Фамилия Имя Отчество', now(), 'APPLICANT');
 
 
 -- Авторизация соискателя
@@ -125,7 +125,7 @@ JOIN company USING (company_id)
 LEFT JOIN cnt USING(interaction_id)
 WHERE resume_id=1
 GROUP BY interaction_id, position, company_name, not_watched_count
-ORDER BY sending_time;
+ORDER BY MAX(sending_time);
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -153,8 +153,7 @@ INSERT INTO recruiter (account_id, company_id, active)
 VALUES (2, 1, TRUE);
 
 -- Открепление рекрутера от компании
-UPDATE recruiter SET active = FALSE
-WHERE (account_id=2 AND company_id=1;
+UPDATE recruiter SET active = FALSE WHERE (account_id=2 AND company_id=1);
 
 
 -- Отобразить все компании рекрутера
@@ -163,7 +162,7 @@ WHERE account_id=2;
 
 
 -- Отобразить всех рекрутеров компании
-SELECT login, company_name
+SELECT login, full_name, company_name
 FROM company JOIN recruiter USING (company_id)
 JOIN account USING (account_id)
 WHERE company_id = 1 AND active = TRUE;
@@ -273,7 +272,7 @@ JOIN resume USING (resume_id)
 LEFT JOIN cnt USING(interaction_id)
 WHERE vacancy_id=3
 GROUP BY interaction_id, position, full_name, not_watched_count
-ORDER BY sending_time;
+ORDER BY MAX(sending_time);
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 -----ОБЩЕЕ------
@@ -287,7 +286,7 @@ UPDATE message SET status='WHATCHED' WHERE message_id=1;
 
 
 -- Просмотр переписки по определенному отклику/приглашению
-SELECT sending_time, message_text, account_type
+SELECT sending_time, message_text, full_name
 FROM message JOIN account USING(account_id)
 JOIN interaction USING (interaction_id) 
 WHERE interaction_id=2

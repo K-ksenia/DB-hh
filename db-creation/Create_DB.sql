@@ -46,6 +46,7 @@ CREATE TABLE account (
     account_id SERIAL PRIMARY KEY,
     login varchar(30) UNIQUE NOT NULL,
     password text NOT NULL,
+    full_name varchar(256) NOT NULL,
     registration_time timestamptz NOT NULL,
     last_login_time timestamptz,
     account_type account_type NOT NULL

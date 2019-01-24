@@ -1,18 +1,19 @@
 INSERT INTO account (
     login,
     password,
+    full_name,
     registration_time,
     account_type
-) VALUES ('petrovpetya@gmail.com', crypt('123451988', gen_salt('bf')), '2018-11-01 12:00:00', 'APPLICANT'),
-('sirsidr@yandex.ru', crypt('qwert12345', gen_salt('bf')), '2018-11-02 12:00:00', 'APPLICANT'),
-('subaru15@gmail.com', crypt('2ue23oi', gen_salt('bf')), '2018-11-03 12:00:00', 'APPLICANT'),
-('lolik@gmail.com', crypt('nfjs111', gen_salt('bf')), '2018-11-04 12:00:00', 'APPLICANT'),
-('bolek@gmail.com', crypt('qwerty', gen_salt('bf')), '2018-11-04 13:00:00', 'APPLICANT'),
-('lampard@gmail.com', crypt('22041985', gen_salt('bf')), '2018-11-05 12:00:00', 'RECRUITER'),
-('nitochka@gmail.com', crypt('alskjd', gen_salt('bf')), '2018-11-06 12:00:00', 'RECRUITER'),
-('fernando@gmail.com', crypt('zxcvb', gen_salt('bf')), '2018-11-07 12:00:00', 'RECRUITER'),
-('ledokol@gmail.com', crypt('lenin1917', gen_salt('bf')), '2018-11-10 12:00:00', 'RECRUITER'),
-('lesorub@gmail.com', crypt('grozniy1547', gen_salt('bf')), '2018-11-17 12:00:00', 'RECRUITER')
+) VALUES ('petrovpetya@gmail.com', crypt('123451988', gen_salt('bf')), 'Петров Петр Петрович', '2018-11-01 12:00:00', 'APPLICANT'),
+('sirsidr@yandex.ru', crypt('qwert12345', gen_salt('bf')), 'Сидоров Сидр Cидорович', '2018-11-02 12:00:00', 'APPLICANT'),
+('subaru15@gmail.com', crypt('2ue23oi', gen_salt('bf')), 'Маремшаов Азамат Рашидович', '2018-11-03 12:00:00', 'APPLICANT'),
+('lolik@gmail.com', crypt('nfjs111', gen_salt('bf')), 'Польский Лелек', '2018-11-04 12:00:00', 'APPLICANT'),
+('bolek@gmail.com', crypt('qwerty', gen_salt('bf')), 'Польский Болек', '2018-11-04 13:00:00', 'APPLICANT'),
+('lampard@gmail.com', crypt('22041985', gen_salt('bf')), 'Фрэнк Лэмпард', '2018-11-05 12:00:00', 'RECRUITER'),
+('nitochka@gmail.com', crypt('alskjd', gen_salt('bf')), 'Уэйн Руни', '2018-11-06 12:00:00', 'RECRUITER'),
+('fernando@gmail.com', crypt('zxcvb', gen_salt('bf')), 'Виктория Сикрет', '2018-11-07 12:00:00', 'RECRUITER'),
+('ledokol@gmail.com', crypt('lenin1917', gen_salt('bf')), 'Джуж Лоу', '2018-11-10 12:00:00', 'RECRUITER'),
+('lesorub@gmail.com', crypt('grozniy1547', gen_salt('bf')), 'Анна Каренина', '2018-11-17 12:00:00', 'RECRUITER')
 ;
 
 INSERT INTO resume (
@@ -262,11 +263,11 @@ INSERT INTO message (
     sending_time,
     status
 ) VALUES (1, 'Добрый день! Меня заинтересовала представленная Вами вакансия. С уважением, Петр', 1, '2018-12-11 12:21:46+03', 'NOTWHATCHED'),
-(2, 'Здравствуйте, Петр! Ваше резюме показалось нам очень интересным. Если наше предложение Вам интересно, свяжитесь со мной, пожалуйста. С уважением, Анна', 6, '2018-12-02 12:21:46+03', 'WHATCHED'),
+(2, 'Здравствуйте, Петр! Ваше резюме показалось нам очень интересным. Если наше предложение Вам интересно, свяжитесь со мной, пожалуйста. С уважением, Анна', 10, '2018-12-02 12:21:46+03', 'WHATCHED'),
 (3, 'Здравствуйте! Меня заинтересовала представленная Вами вакансия. С уважением, Сидр', 2, '2018-12-25 12:21:46+03', 'NOTWHATCHED'),
 (4, 'Добрый день, Азамат! Ваше резюме показалось нам очень интересным. Если наше предложение Вам интересно, свяжитесь со мной, пожалуйста. С уважением, Виктория', 8, '2018-12-11 12:21:46+03', 'NOTWHATCHED'),
 (5, 'Добрый день! Ваше резюме показалось нам очень интересным. С уважением, Яндекс', 10, '2018-12-01 12:21:46+03', 'NOTWHATCHED'),
-(1, 'Добрый день! Ваша кандидатура нам оч интересна! Вам удобно будет придти на собеседование завтра в 15:00? С уважением, Софья', 7, '2018-12-11 15:21:46+03', 'NOTWHATCHED')
+(1, 'Добрый день! Ваша кандидатура нам оч интересна! Вам удобно будет придти на собеседование завтра в 15:00? С уважением, Анна', 10, '2018-12-11 15:21:46+03', 'NOTWHATCHED')
 ;
 
 INSERT INTO skill (
