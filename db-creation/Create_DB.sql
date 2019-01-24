@@ -125,7 +125,7 @@ CREATE TABLE message (
 
 CREATE TABLE skill (
     skill_id SERIAL PRIMARY KEY,
-    skill_name varchar(128) UNIQUE NOT NULL,
+    skill_name varchar(128) NOT NULL,
     confirmed bool NOT NULL
 );
 
