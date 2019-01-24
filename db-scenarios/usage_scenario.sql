@@ -81,24 +81,25 @@ VALUES (1, 1, CURRENT_TIMESTAMP, 'REPLY', 'NOTWHATCHED');
 
 
 -- Просмотр всех резюме соискателя + количество непрочитанных приглашений
-SELECT full_name, position, city, salary, publication_begin_time, 
-(SELECT COUNT(*) FROM interaction i WHERE status='NOTWHATCHED' AND i.resume_id=r.resume_id
-	GROUP BY interaction_id) AS not_watched_count
-FROM resume r
+WITH cnt AS (SELECT resume_id, COUNT(*) not_watched_count 
+	FROM interaction WHERE status='NOTWHATCHED'
+	GROUP BY interaction_id)
+SELECT full_name, position, city, salary, publication_begin_time, not_watched_count
+FROM resume LEFT OUTER JOIN cnt USING(resume_id)
 WHERE account_id=1 AND active = TRUE
 ORDER BY publication_begin_time DESC;
 
 
 -- Просмотр всех приглашений по выбранному резюме
-SELECT position, (SELECT company_name FROM company c WHERE c.company_id=v.company_id), publication_time, status
-FROM interaction JOIN vacancy v USING(vacancy_id)
+SELECT position, company_name, publication_time, status
+FROM interaction JOIN vacancy v USING(vacancy_id) JOIN company USING(company_id)
 WHERE resume_id=1 AND interaction_type='INVITE' AND active = TRUE
 ORDER BY publication_time;
 
 
 -- Показать только непросмотренные приглашения (аналогично можно посмотреть просмотренные, отклоненные или принятые)
-SELECT position, (SELECT company_name FROM company c WHERE c.company_id=v.company_id), publication_time
-FROM interaction JOIN vacancy v USING(vacancy_id)
+SELECT position, company_name, publication_time
+FROM interaction JOIN vacancy v USING(vacancy_id) JOIN company USING(company_id)
 WHERE resume_id=1 AND interaction_type='INVITE' AND status='NOTWHATCHED' AND active = TRUE
 ORDER BY publication_time;
 
@@ -113,15 +114,17 @@ VALUES (1, 'Добрый день! Текст сообщения от соиск
 
 
 -- Просмотр соискателем всех диалогов 
-SELECT MAX(sending_time) AS sending_time, position, company_name, active,
-(SELECT COUNT(*) FROM message m2 WHERE status='NOTWHATCHED' AND m2.interaction_id=m1.interaction_id
-	GROUP BY interaction_id) AS not_watched_count
-FROM message m1
+WITH cnt AS (SELECT interaction_id, COUNT(*) not_watched_count FROM message 
+	WHERE status='NOTWHATCHED'
+	GROUP BY interaction_id)
+SELECT MAX(sending_time) AS sending_time, position, company_name, not_watched_count
+FROM message
 JOIN interaction USING (interaction_id) 
 JOIN vacancy USING (vacancy_id)
 JOIN company USING (company_id)
+LEFT OUTER JOIN cnt USING(interaction_id)
 WHERE resume_id=1
-GROUP BY interaction_id, position, company_name, active
+GROUP BY interaction_id, position, company_name, not_watched_count
 ORDER BY sending_time;
 
 
@@ -221,11 +224,11 @@ VALUES (1, 1, CURRENT_TIMESTAMP, 'INVITE', 'NOTWHATCHED');
 
 
 -- Просмотр всех вакансий рекрутера + количество непрочитанных откликов
-SELECT position, city, salary, required_experience, publication_begin_time, 
-(SELECT company_name FROM company c WHERE c.company_id=v.company_id) AS company_name,
-(SELECT COUNT(*) FROM interaction i WHERE status='NOTWHATCHED' AND i.vacancy_id=v.vacancy_id
-	GROUP BY interaction_id) AS not_watched_count
-FROM vacancy v
+WITH cnt AS (SELECT vacancy_id, COUNT(*) not_watched_count 
+	FROM interaction WHERE status='NOTWHATCHED'
+	GROUP BY interaction_id)
+SELECT position, company_name, city, salary, required_experience, publication_begin_time, not_watched_count
+FROM vacancy JOIN company USING(company_id) LEFT OUTER JOIN cnt USING(vacancy_id)
 WHERE recruiter_id=1 AND active = TRUE
 ORDER BY publication_begin_time DESC;
 
@@ -260,16 +263,17 @@ VALUES (2, 'Добрый день! Текст сообщения от работ
 
 
 -- Просмотр рекрутером всех диалогов по выбранной вакансии
-SELECT MAX(sending_time) AS sending_time, position, full_name, active,
-(SELECT COUNT(*) FROM message m2 WHERE status='NOTWHATCHED' AND m2.interaction_id=m1.interaction_id
-	GROUP BY interaction_id) AS not_watched_count
-FROM message m1
+WITH cnt AS (SELECT interaction_id, COUNT(*) not_watched_count FROM message 
+	WHERE status='NOTWHATCHED'
+	GROUP BY interaction_id)
+SELECT MAX(sending_time) AS sending_time, position, full_name, not_watched_count
+FROM message
 JOIN interaction USING (interaction_id) 
 JOIN resume USING (resume_id)
-WHERE vacancy_id=1
-GROUP BY interaction_id, position, full_name, active
+LEFT OUTER JOIN cnt USING(interaction_id)
+WHERE vacancy_id=3
+GROUP BY interaction_id, position, full_name, not_watched_count
 ORDER BY sending_time;
-
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 -----ОБЩЕЕ------
@@ -283,10 +287,11 @@ UPDATE message SET status='WHATCHED' WHERE message_id=1;
 
 
 -- Просмотр переписки по определенному отклику/приглашению
-SELECT sending_time, message_text, (SELECT login FROM account c WHERE c.account_id=m.account_id)
-FROM message m
+SELECT sending_time, message_text, account_type
+FROM message JOIN account USING(account_id)
 JOIN interaction USING (interaction_id) 
-WHERE interaction_id=2;
+WHERE interaction_id=2
+ORDER BY sending_time;
 -- Cтавим всем новым сообшениям в этой переписке статус "Просмотрено"
 WITH not_watched_messages AS (SELECT message_id
 FROM message JOIN interaction USING (interaction_id) 
